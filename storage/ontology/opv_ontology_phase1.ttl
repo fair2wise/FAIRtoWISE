@@ -1,0 +1,61 @@
+@prefix opv: <http://opv-kg.org/ontology/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+opv:BulkHeterojunction a owl:Class ;
+    rdfs:label "BulkHeterojunction" ;
+    opv:contains_material opv:P3HT,
+        opv:PCBM ;
+    rdfs:comment "A mixed layer of donor and acceptor materials with a high interfacial area" ;
+    rdfs:subClassOf opv:DeviceArchitecture .
+
+opv:Experiment a owl:Class .
+
+opv:ProcessingMethod a owl:Class ;
+    rdfs:label "ProcessingMethod" ;
+    opv:affects opv:DomainOrientation ;
+    rdfs:comment "A technique used to create or modify a material or device" .
+
+opv:affects a owl:ObjectProperty ;
+    rdfs:comment "Processing methods can influence the orientation of P3HT domains" .
+
+opv:contains_material a owl:ObjectProperty ;
+    rdfs:comment "P3HT is commonly used as the donor material in bulk heterojunction OPVs",
+        "PCBM is commonly used as the acceptor material in bulk heterojunction OPVs" .
+
+opv:has_property a owl:ObjectProperty ;
+    rdfs:comment "P3HT forms domains with specific orientations that affect device performance" .
+
+opv:Device a owl:Class .
+
+opv:DeviceArchitecture a owl:Class ;
+    rdfs:subClassOf opv:Device .
+
+opv:MorphologicalProperty a owl:Class ;
+    rdfs:subClassOf opv:Property .
+
+opv:P3HT a owl:Class ;
+    rdfs:label "P3HT" ;
+    opv:has_property opv:DomainOrientation ;
+    rdfs:comment "Poly(3-hexylthiophene), a semiconducting polymer commonly used in OPVs" ;
+    rdfs:subClassOf opv:Polymer .
+
+opv:PCBM a owl:Class ;
+    rdfs:label "PCBM" ;
+    rdfs:comment "Phenyl-C61-butyric acid methyl ester, a fullerene derivative commonly used as an electron acceptor in OPVs" ;
+    rdfs:subClassOf opv:Material .
+
+opv:Polymer a owl:Class ;
+    rdfs:label "Polymer" ;
+    rdfs:comment "A large molecule composed of repeating structural units" ;
+    rdfs:subClassOf opv:Material .
+
+opv:Property a owl:Class .
+
+opv:DomainOrientation a owl:Class ;
+    rdfs:label "DomainOrientation" ;
+    rdfs:comment "The alignment direction of polymer domains within a film" ;
+    rdfs:subClassOf opv:MorphologicalProperty .
+
+opv:Material a owl:Class .
+

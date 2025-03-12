@@ -5,30 +5,62 @@ This template includes common configuration and settings for ALS Computing proje
 <!-- TREE START -->
 <pre>
 .
-├── <a href="https://github.com/als-computing/project_template/blob/main/Dockerfile">Dockerfile</a>
-├── <a href="https://github.com/als-computing/project_template/blob/main/README.md">README.md</a>
-├── <a href="https://github.com/als-computing/project_template/tree/main/_tests">_tests</a>
-│   └── <a href="https://github.com/als-computing/project_template/blob/main/_tests/test_example.py">test_example.py</a>
-├── <a href="https://github.com/als-computing/project_template/tree/main/mkdocs">mkdocs</a>
-│   ├── <a href="https://github.com/als-computing/project_template/tree/main/mkdocs/docs">docs</a>
-│   │   ├── <a href="https://github.com/als-computing/project_template/blob/main/mkdocs/docs/about.md">about.md</a>
-│   │   ├── <a href="https://github.com/als-computing/project_template/tree/main/mkdocs/docs/assets">assets</a>
-│   │   │   ├── <a href="https://github.com/als-computing/project_template/blob/main/mkdocs/docs/assets/als_style.css">als_style.css</a>
-│   │   │   └── <a href="https://github.com/als-computing/project_template/tree/main/mkdocs/docs/assets/images">images</a>
-│   │   │       ├── <a href="https://github.com/als-computing/project_template/blob/main/mkdocs/docs/assets/images/doe_logo.png">doe_logo.png</a>
-│   │   │       └── <a href="https://github.com/als-computing/project_template/blob/main/mkdocs/docs/assets/images/lbl_logo.png">lbl_logo.png</a>
-│   │   ├── <a href="https://github.com/als-computing/project_template/blob/main/mkdocs/docs/index.md">index.md</a>
-│   │   └── <a href="https://github.com/als-computing/project_template/blob/main/mkdocs/docs/test.md">test.md</a>
-│   ├── <a href="https://github.com/als-computing/project_template/blob/main/mkdocs/mkdocs.yml">mkdocs.yml</a>
-│   └── <a href="https://github.com/als-computing/project_template/tree/main/mkdocs/overrides">overrides</a>
-│       ├── <a href="https://github.com/als-computing/project_template/tree/main/mkdocs/overrides/assets">assets</a>
-│       │   └── <a href="https://github.com/als-computing/project_template/tree/main/mkdocs/overrides/assets/images">images</a>
-│       │       └── <a href="https://github.com/als-computing/project_template/blob/main/mkdocs/overrides/assets/images/favicon.png">favicon.png</a>
-│       └── <a href="https://github.com/als-computing/project_template/blob/main/mkdocs/overrides/main.html">main.html</a>
-├── <a href="https://github.com/als-computing/project_template/blob/main/pytest.ini">pytest.ini</a>
-├── <a href="https://github.com/als-computing/project_template/blob/main/requirements.txt">requirements.txt</a>
-└── <a href="https://github.com/als-computing/project_template/tree/main/scripts">scripts</a>
-    └── <a href="https://github.com/als-computing/project_template/blob/main/scripts/update_readme_tree.py">update_readme_tree.py</a>
+├── Dockerfile
+├── README.md
+├── _tests
+│   └── test_example.py
+├── app
+│   ├── __init__.py
+│   ├── llm_factory.py
+│   ├── main.py
+│   └── modules
+│       ├── __init__.py
+│       ├── extractor.py
+│       ├── extractor_base.py
+│       ├── extractor_cborg.py
+│       ├── extractor_factory.py
+│       ├── extractor_ollama.py
+│       ├── knowledge_graph.py
+│       ├── ontology.py
+│       └── rag.py
+├── data
+├── mkdocs
+│   ├── docs
+│   │   ├── about.md
+│   │   ├── assets
+│   │   │   ├── als_style.css
+│   │   │   └── images
+│   │   │       ├── doe_logo.png
+│   │   │       └── lbl_logo.png
+│   │   ├── index.md
+│   │   └── test.md
+│   ├── mkdocs.yml
+│   └── overrides
+│       ├── assets
+│       │   └── images
+│       │       └── favicon.png
+│       └── main.html
+├── polymer_papers
+├── polymer_papers_all
+├── pytest.ini
+├── requirements.txt
+├── scripts
+│   └── update_readme_tree.py
+└── storage
+    ├── kg
+    ├── ontology
+    │   ├── opv_ontology_DeepSeek70b_CBORG.ttl
+    │   ├── opv_ontology_after_extraction.owl
+    │   ├── opv_ontology_after_extraction.ttl
+    │   ├── opv_ontology_current.owl
+    │   ├── opv_ontology_current.ttl
+    │   ├── opv_ontology_phase1.owl
+    │   ├── opv_ontology_phase1.ttl
+    │   ├── opv_ontology_updated.owl
+    │   └── opv_ontology_updated.ttl
+    └── vector
+
+21 directories, 131 files
 </pre>
 <!-- TREE END -->
 
