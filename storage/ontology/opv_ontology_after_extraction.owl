@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+   xmlns:opv="http://opv-kg.org/ontology/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+>
+  <rdf:Description rdf:about="http://opv-kg.org/ontology/DeviceArchitecture">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="http://opv-kg.org/ontology/Device"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://opv-kg.org/ontology/ProcessingMethod">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label>ProcessingMethod</rdfs:label>
+    <rdfs:comment>A technique used to create or modify a material or device</rdfs:comment>
+    <opv:affects rdf:resource="http://opv-kg.org/ontology/DomainOrientation"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://opv-kg.org/ontology/BulkHeterojunction">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label>BulkHeterojunction</rdfs:label>
+    <rdfs:comment>A mixed layer of donor and acceptor materials with a high interfacial area</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://opv-kg.org/ontology/DeviceArchitecture"/>
+    <opv:contains_material rdf:resource="http://opv-kg.org/ontology/P3HT"/>
+    <opv:contains_material rdf:resource="http://opv-kg.org/ontology/PCBM"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://opv-kg.org/ontology/Polymer">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="http://opv-kg.org/ontology/Material"/>
+    <rdfs:label>Polymer</rdfs:label>
+    <rdfs:comment>A large molecule composed of repeating structural units</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://opv-kg.org/ontology/contains_material">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:comment>P3HT is commonly used as the donor material in bulk heterojunction OPVs</rdfs:comment>
+    <rdfs:comment>PCBM is commonly used as the acceptor material in bulk heterojunction OPVs</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://opv-kg.org/ontology/P3HT">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label>P3HT</rdfs:label>
+    <rdfs:comment>Poly(3-hexylthiophene), a semiconducting polymer commonly used in OPVs</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://opv-kg.org/ontology/Polymer"/>
+    <opv:has_property rdf:resource="http://opv-kg.org/ontology/DomainOrientation"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://opv-kg.org/ontology/Experiment">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://opv-kg.org/ontology/affects">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:comment>Processing methods can influence the orientation of P3HT domains</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://opv-kg.org/ontology/has_property">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:comment>P3HT forms domains with specific orientations that affect device performance</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://opv-kg.org/ontology/PCBM">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label>PCBM</rdfs:label>
+    <rdfs:comment>Phenyl-C61-butyric acid methyl ester, a fullerene derivative commonly used as an electron acceptor in OPVs</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://opv-kg.org/ontology/Material"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://opv-kg.org/ontology/DomainOrientation">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label>DomainOrientation</rdfs:label>
+    <rdfs:comment>The alignment direction of polymer domains within a film</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://opv-kg.org/ontology/MorphologicalProperty"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://opv-kg.org/ontology/Property">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://opv-kg.org/ontology/MorphologicalProperty">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="http://opv-kg.org/ontology/Property"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://opv-kg.org/ontology/Material">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://opv-kg.org/ontology/Device">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </rdf:Description>
+</rdf:RDF>
