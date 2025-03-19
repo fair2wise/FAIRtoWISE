@@ -9,21 +9,6 @@ This template includes common configuration and settings for ALS Computing proje
 ├── README.md
 ├── _tests
 │   └── test_example.py
-├── app
-│   ├── __init__.py
-│   ├── llm_factory.py
-│   ├── main.py
-│   └── modules
-│       ├── __init__.py
-│       ├── extractor.py
-│       ├── extractor_base.py
-│       ├── extractor_cborg.py
-│       ├── extractor_factory.py
-│       ├── extractor_ollama.py
-│       ├── knowledge_graph.py
-│       ├── ontology.py
-│       └── rag.py
-├── data
 ├── mkdocs
 │   ├── docs
 │   │   ├── about.md
@@ -41,26 +26,106 @@ This template includes common configuration and settings for ALS Computing proje
 │       │       └── favicon.png
 │       └── main.html
 ├── polymer_papers
-├── polymer_papers_all
+│   ├── 10.1002adfm.201002014.pdf
+│   ├── 10.1002adfm.201301121.pdf
+│   ├── 10.1002adfm.201304216.pdf
+│   ├── 10.1002adfm.201801874.pdf
+│   ├── 10.1002adfm.201802895.pdf
+│   ├── 10.1002adfm.201806262.pdf
+│   ├── 10.1002adfm.201806977.pdf
+│   ├── 10.1002adfm.201902238.pdf
+│   ├── 10.1002adfm.201902478.pdf
+│   ├── 10.1002adfm.201906855.pdf
+│   ├── 10.1002adfm.202000489.pdf
+│   ├── 10.1002adfm.202008699.pdf
+│   ├── 10.1002adfm.202102522.pdf
+│   ├── 10.1002adfm.202105304.pdf
+│   ├── 10.1002adfm.202109271.pdf
+│   ├── 10.1002adfm.202112511.pdf
+│   ├── 10.1002adfm.202201150.pdf
+│   ├── 10.1002adfm.202305611.pdf
+│   ├── 10.1002adma.201102421.pdf
+│   ├── 10.1002adma.201405913.pdf
+│   ├── 10.1002adma.201505435.pdf
+│   ├── 10.1002adma.201604603.pdf
+│   ├── 10.1002adma.201606574.pdf
+│   ├── 10.1002adma.201700144.pdf
+│   ├── 10.1002adma.201703777.pdf
+│   ├── 10.1002adma.201704713.pdf
+│   ├── 10.1002adma.201705243.pdf
+│   ├── 10.1002adma.201705485.pdf
+│   ├── 10.1002adma.201801501.pdf
+│   ├── 10.1002adma.201803045.pdf
+│   ├── 10.1002adma.201806660.pdf
+│   ├── 10.1002adma.201808279.pdf
+│   ├── 10.1002adma.201902899.pdf
+│   ├── 10.1002adma.202002784.pdf
+│   ├── 10.1002adma.202005897.pdf
+│   ├── 10.1002adma.202105707.pdf
+│   ├── 10.1002adma.202107316.pdf
+│   ├── 10.1002adma.202108317.pdf
+│   ├── 10.1002adma.202108749.pdf
+│   ├── 10.1002adma.202110155.pdf
+│   ├── 10.1002adma.202202608.pdf
+│   ├── 10.1002adma.202203379.pdf
+│   ├── 10.1002adma.202205926.pdf
+│   ├── 10.1002adma.202207020.pdf
+│   ├── 10.1002adom.202300776.pdf
+│   ├── 10.1002advs.201500095.pdf
+│   ├── 10.1002advs.201500250.pdf
+│   ├── 10.1002advs.201600032.pdf
+│   ├── 10.1002advs.201600117.pdf
+│   ├── 10.1002advs.201903419.pdf
+│   ├── 10.1002advs.202000149.pdf
+│   ├── 10.1002advs.202001986.pdf
+│   ├── 10.1002advs.202104613.pdf
+│   ├── 10.1002advs.202203513.pdf
+│   ├── 10.1002advs.202302880.pdf
+│   ├── 10.1002aelm.201800915.pdf
+│   ├── 10.1002aelm.202300422.pdf
+│   ├── 10.1002aenm.201601225.pdf
+│   ├── 10.1002aenm.201700390.pdf
+│   ├── 10.1002aenm.201700519.pdf
+│   ├── 10.1002aenm.201701073.pdf
+│   ├── 10.1002aenm.201701201.pdf
+│   ├── 10.1002aenm.201701942.pdf
+│   ├── 10.1002aenm.201702831.pdf
+│   ├── 10.1002aenm.201702941.pdf
+│   ├── 10.1002aenm.201703058.pdf
+│   ├── 10.1002aenm.201800550.pdf
+│   ├── 10.1002aenm.201802050.pdf
+│   ├── 10.1002aenm.201901728.pdf
+│   ├── 10.1002aenm.201903609.pdf
+│   ├── 10.1002aenm.202001203.pdf
+│   ├── 10.1002aenm.202001589.pdf
+│   ├── 10.1002aenm.202003141.pdf
+│   ├── 10.1002aenm.202102135.pdf
+│   ├── 10.1002aenm.202200641.pdf
+│   ├── 10.1002aenm.202300249.pdf
+│   ├── 10.1002aenm.202300980.pdf
+│   ├── 10.1002anie.201806354.pdf
+│   ├── 10.1002anie.202115585.pdf
+│   ├── 10.1002app.45399.pdf
+│   ├── 10.1002asia.201100419.pdf
+│   ├── 10.1002chem.202002632.pdf
+│   └── 10.1002cphc.200901023.pdf
 ├── pytest.ini
 ├── requirements.txt
 ├── scripts
 │   └── update_readme_tree.py
 └── storage
-    ├── kg
-    ├── ontology
-    │   ├── opv_ontology_DeepSeek70b_CBORG.ttl
-    │   ├── opv_ontology_after_extraction.owl
-    │   ├── opv_ontology_after_extraction.ttl
-    │   ├── opv_ontology_current.owl
-    │   ├── opv_ontology_current.ttl
-    │   ├── opv_ontology_phase1.owl
-    │   ├── opv_ontology_phase1.ttl
-    │   ├── opv_ontology_updated.owl
-    │   └── opv_ontology_updated.ttl
-    └── vector
+    └── ontology
+        ├── opv_ontology_DeepSeek70b_CBORG.ttl
+        ├── opv_ontology_after_extraction.owl
+        ├── opv_ontology_after_extraction.ttl
+        ├── opv_ontology_current.owl
+        ├── opv_ontology_current.ttl
+        ├── opv_ontology_phase1.owl
+        ├── opv_ontology_phase1.ttl
+        ├── opv_ontology_updated.owl
+        └── opv_ontology_updated.ttl
 
-21 directories, 131 files
+13 directories, 107 files
 </pre>
 <!-- TREE END -->
 
