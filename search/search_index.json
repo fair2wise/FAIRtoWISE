@@ -1,0 +1,1 @@
+{"config":{"lang":["en"],"separator":"[\\s\\-]+","pipeline":["stopWordFilter"]},"docs":[{"location":"","title":"Welcome to the ALS Computing MkDocs Template","text":"<p>You can use this to make sweet documentation!</p>"},{"location":"about/","title":"About","text":"<p>This template is created and maintained by the ALS Computing Group and subject to change.</p>"}]}
