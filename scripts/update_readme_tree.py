@@ -48,14 +48,13 @@ def get_tree_output(target_dir: str = ".") -> str:
         subprocess.CalledProcessError: If the 'tree' command fails.
     """
     if shutil.which("tree") is None:
-        raise EnvironmentError("The 'tree' command is not available. Please install it.")
+        raise EnvironmentError(
+            "The 'tree' command is not available. Please install it."
+        )
 
     try:
         result = subprocess.run(
-            ["tree", target_dir],
-            capture_output=True,
-            text=True,
-            check=True
+            ["tree", target_dir], capture_output=True, text=True, check=True
         )
         return result.stdout.strip()
     except subprocess.CalledProcessError as e:
@@ -63,7 +62,9 @@ def get_tree_output(target_dir: str = ".") -> str:
         raise
 
 
-def generate_tree_with_links(current_dir: str, base_path: str, repo_url: str, branch: str, prefix: str = "") -> list[str]:
+def generate_tree_with_links(
+    current_dir: str, base_path: str, repo_url: str, branch: str, prefix: str = ""
+) -> list[str]:
     """
     Recursively generate a tree with HTML hyperlinks for each file and directory.
 
@@ -88,7 +89,9 @@ def generate_tree_with_links(current_dir: str, base_path: str, repo_url: str, br
     tree_lines = []
     try:
         # List non-hidden entries
-        entries = [entry for entry in os.listdir(current_dir) if not entry.startswith('.')]
+        entries = [
+            entry for entry in os.listdir(current_dir) if not entry.startswith(".")
+        ]
     except OSError as e:
         raise OSError(f"Unable to list directory '{current_dir}': {e.strerror}") from e
 
@@ -96,7 +99,7 @@ def generate_tree_with_links(current_dir: str, base_path: str, repo_url: str, br
     count = len(entries)
     for i, entry in enumerate(entries):
         full_path = os.path.join(current_dir, entry)
-        is_last = (i == count - 1)
+        is_last = i == count - 1
         branch_symbol = "└── " if is_last else "├── "
 
         # Compute the relative path for hyperlinking
@@ -114,7 +117,11 @@ def generate_tree_with_links(current_dir: str, base_path: str, repo_url: str, br
 
         if os.path.isdir(full_path):
             extension = "    " if is_last else "│   "
-            tree_lines.extend(generate_tree_with_links(full_path, base_path, repo_url, branch, prefix + extension))
+            tree_lines.extend(
+                generate_tree_with_links(
+                    full_path, base_path, repo_url, branch, prefix + extension
+                )
+            )
     return tree_lines
 
 
@@ -146,8 +153,7 @@ def update_readme_tree(readme_path: str, tree_output: str) -> None:
 
     # Regex pattern to match the tree snippet between markers (using DOTALL mode)
     pattern = re.compile(
-        r"(<!--\s*TREE START\s*-->)(.*?)(<!--\s*TREE END\s*-->)",
-        re.DOTALL
+        r"(<!--\s*TREE START\s*-->)(.*?)(<!--\s*TREE END\s*-->)", re.DOTALL
     )
 
     # Wrap the tree output in a <pre> block (GitHub preserves whitespace in <pre> and renders HTML)
@@ -186,25 +192,25 @@ def parse_arguments() -> argparse.Namespace:
         "--readme",
         type=str,
         default="README.md",
-        help="Path to the README.md file (default: README.md)"
+        help="Path to the README.md file (default: README.md)",
     )
     parser.add_argument(
         "--dir",
         type=str,
         default=".",
-        help="Target directory to generate the tree output from (default: current directory)"
+        help="Target directory to generate the tree output from (default: current directory)",
     )
     parser.add_argument(
         "--repo-url",
         type=str,
         default="",
-        help="Base URL of the repository (e.g., https://github.com/user/repo). If provided, tree entries will be hyperlinked."
+        help="Base URL of the repository (e.g., https://github.com/user/repo). If provided, tree entries will be hyperlinked.",
     )
     parser.add_argument(
         "--branch",
         type=str,
         default="main",
-        help="Repository branch to link to (default: main)"
+        help="Repository branch to link to (default: main)",
     )
     return parser.parse_args()
 
@@ -221,7 +227,11 @@ def main() -> None:
     if args.repo_url:
         base_path = os.path.abspath(target_dir)
         tree_lines = ["."]  # Root line
-        tree_lines.extend(generate_tree_with_links(base_path, base_path, args.repo_url.rstrip("/"), args.branch))
+        tree_lines.extend(
+            generate_tree_with_links(
+                base_path, base_path, args.repo_url.rstrip("/"), args.branch
+            )
+        )
         tree_output = "\n".join(tree_lines)
     else:
         try:
