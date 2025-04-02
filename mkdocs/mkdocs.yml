@@ -12,7 +12,8 @@ nav:
 - Home: index.md
 - About: about.md
 - Test: test.md
-
+- Core Model: core_model.md
+- Workflow: workflow.md
 # Theme and Plugins
 theme:
   name: material

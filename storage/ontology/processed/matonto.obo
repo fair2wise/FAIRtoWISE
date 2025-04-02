@@ -1,0 +1,30 @@
+format-version: 1.2
+ontology: http://example.org/materials/
+owl-axioms: Prefix(owl:=<http://www.w3.org/2002/07/owl#>)\nPrefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)\nPrefix(xml:=<http://www.w3.org/XML/1998/namespace>)\nPrefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)\nPrefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)\n\n\nOntology(\nDeclaration(Class(<http://example.org/materials/Application>))\nDeclaration(Class(<http://example.org/materials/Material>))\nDeclaration(Class(<http://example.org/materials/Method>))\nDeclaration(Class(<http://example.org/materials/Property>))\nDeclaration(Class(<http://example.org/materials/Structure>))\n############################\n#   Classes\n############################\n\n# Class: <http://example.org/materials/Application> (<http://example.org/materials/Application>)\n\nSubClassOf(<http://example.org/materials/Application> owl:Thing)\n\n# Class: <http://example.org/materials/Material> (<http://example.org/materials/Material>)\n\nSubClassOf(<http://example.org/materials/Material> owl:Thing)\n\n# Class: <http://example.org/materials/Method> (<http://example.org/materials/Method>)\n\nSubClassOf(<http://example.org/materials/Method> owl:Thing)\n\n# Class: <http://example.org/materials/Property> (<http://example.org/materials/Property>)\n\nSubClassOf(<http://example.org/materials/Property> owl:Thing)\n\n# Class: <http://example.org/materials/Structure> (<http://example.org/materials/Structure>)\n\nSubClassOf(<http://example.org/materials/Structure> owl:Thing)\n\n\n)
+name: Materials Science Ontology
+
+[Term]
+id: http://example.org/materials/Application
+name: Application
+comment: Applications or uses of materials
+
+[Term]
+id: http://example.org/materials/Material
+name: Material
+comment: Any material, substance, or compound in materials science
+
+[Term]
+id: http://example.org/materials/Method
+name: Method
+comment: Processing methods, synthesis techniques, or characterization approaches
+
+[Term]
+id: http://example.org/materials/Property
+name: Property
+comment: Properties or characteristics of materials
+
+[Term]
+id: http://example.org/materials/Structure
+name: Structure
+comment: Structural aspects of materials
+
