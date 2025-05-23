@@ -15,10 +15,15 @@ K_NEIGHBORS = 3              # how many KG nodes to pull per query
 HOPS = 4                     # default neighborhood size
 EMBED_MODEL = "all-MiniLM-L6-v2"  # 80 MB, fast & solid
 
+# === GLOBAL CHAT HISTORIES ==============================================
+# We keep separate message lists so the RAG and baseline chats do NOT bleed
+# knowledge into each other.
+rag_history: List[Dict[str, str]] = []
+baseline_history: List[Dict[str, str]] = []
+
 # === KNOWLEDGE GRAPH =====================================================
 class KnowledgeGraph:
     """Lightweight in‑memory property‑graph wrapper."""
-
     def __init__(self, graph_file: str):
         with open(graph_file, "r") as f:
             data = json.load(f)
@@ -65,7 +70,6 @@ class KnowledgeGraph:
 # === NODE SEARCHER =======================================================
 class NodeSearcher:
     """Hybrid embedding + fuzzy keyword retrieval over KG nodes."""
-
     def __init__(self, kg: KnowledgeGraph):
         self.kg = kg
         self.model = SentenceTransformer(EMBED_MODEL)
@@ -110,14 +114,17 @@ class NodeSearcher:
                 break
         return best
 
-# === OLLAMA CALL =========================================================
-def _call_ollama(prompt: str, model: str = OLLAMA_MODEL, temperature: float = 0.0) -> str:
+# === OLLAMA CALLER =======================================================
+
+def _call_ollama(prompt: str, history: List[Dict[str, str]], model: str = OLLAMA_MODEL, temperature: float = 0.0) -> str:
+    """Send prompt + prior history to Ollama, update history with assistant reply."""
+    messages = history + [{"role": "user", "content": prompt}]
     try:
         r = requests.post(
             OLLAMA_API_URL,
             json={
                 "model": model,
-                "messages": [{"role": "user", "content": prompt}],
+                "messages": messages,
                 "stream": False,
                 "options": {"temperature": temperature},
             },
@@ -128,33 +135,40 @@ def _call_ollama(prompt: str, model: str = OLLAMA_MODEL, temperature: float = 0.
         try:
             data = r.json()
         except ValueError:
+            # fallback for newline‑delimited JSON
+            data = None
             for line in reversed([ln for ln in r.text.splitlines() if ln.strip()]):
                 try:
                     data = json.loads(line)
                     break
                 except ValueError:
                     continue
-            else:
+            if data is None:
                 return "[Cannot parse LLM response]"
-        return data.get("message", {}).get("content", "[No content]")
+        content = data.get("message", {}).get("content", "[No content]")
+        history.append({"role": "assistant", "content": content})
+        return content
     except Exception as e:
         return f"[Exception: {e}]"
 
 # === PROMPT HELPERS ======================================================
 
 def ask_rag(question: str, context: str) -> str:
-    p = f"""Use the following knowledge‑graph context to answer the question.
+    prompt = f"""Use the following knowledge‑graph context to answer the question.
 
 Context:
 {context}
 
 Question: {question}
 Answer:"""
-    return _call_ollama(p)
+    rag_history.append({"role": "system", "content": "You are an expert materials‑science assistant."}) if not rag_history else None
+    return _call_ollama(prompt, rag_history)
 
 
 def ask_baseline(question: str) -> str:
-    return _call_ollama(f"Answer using your general knowledge:\n\nQuestion: {question}\nAnswer:")
+    baseline_history.append({"role": "system", "content": "You are an expert materials‑science assistant without access to the KG."}) if not baseline_history else None
+    prompt = f"Answer the following question concisely and accurately:\n\nQuestion: {question}\nAnswer:"
+    return _call_ollama(prompt, baseline_history)
 
 # === CLI LOOP ============================================================
 
