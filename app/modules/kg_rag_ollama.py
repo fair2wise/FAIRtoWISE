@@ -1,204 +1,227 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+kg_rag_ollama.py –– Enhanced KG-RAG integration with Ollama with terminal color,
+now including PDF snippets from any node’s listed source papers in polymer_papers/.
+"""
+import argparse
+import asyncio
 import json
-from typing import List, Dict, Any, Set
-from collections import defaultdict
-import requests
-import numpy as np
-from rapidfuzz import fuzz  # fuzzy keyword boost
-from sentence_transformers import SentenceTransformer
+import logging
+import sys
+import fitz              # PyMuPDF for PDF text extraction
+from collections import defaultdict, deque
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+import aiohttp
 import faiss
+import numpy as np
+from rapidfuzz import fuzz
+from sentence_transformers import SentenceTransformer
+from colorama import init as colorama_init, Fore, Style
 
 # === CONFIGURATION ===
-OLLAMA_MODEL = "mistral-small3.1:latest"  # "llama3.2"  # Adjust if you use a different tag
-OLLAMA_API_URL = "http://localhost:11434/api/chat"
-GRAPH_FILE = "storage/kg/matkg_graph.json"
-K_NEIGHBORS = 3              # how many KG nodes to pull per query
-HOPS = 4                     # default neighborhood size
-EMBED_MODEL = "all-MiniLM-L6-v2"  # 80 MB, fast & solid
+OLLAMA_MODEL     = "gemma3:27b"
+OLLAMA_API_URL   = "http://localhost:11434/api/chat"
+GRAPH_FILE       = "/pscratch/sd/d/dabramov/fair2wise/storage/kg/matkg-jun6.json"
+PDF_DIR          = "polymer_papers"    # directory where the PDFs live
+DEFAULT_K        = 4
+DEFAULT_MAX_HOPS = 3
+EMBED_MODEL      = "all-MiniLM-L6-v2"
+PDF_SNIPPET_LEN  = 1000   # characters to pull from each PDF
 
-# === GLOBAL CHAT HISTORIES ==============================================
-# We keep separate message lists so the RAG and baseline chats do NOT bleed
-# knowledge into each other.
-rag_history: List[Dict[str, str]] = []
-baseline_history: List[Dict[str, str]] = []
+# Initialize colorama
+colorama_init(autoreset=True)
 
-# === KNOWLEDGE GRAPH =====================================================
+# Setup logging with colored timestamps
+class ColorFormatter(logging.Formatter):
+    def format(self, record):
+        time = Fore.CYAN + self.formatTime(record) + Style.RESET_ALL
+        level = record.levelname
+        msg = record.getMessage()
+        return f"{time} {Fore.MAGENTA}{level}{Style.RESET_ALL}: {msg}"
+
+handler = logging.StreamHandler(sys.stdout)
+handler.setFormatter(ColorFormatter())
+logger = logging.getLogger("kg_rag_ollama")
+logger.addHandler(handler)
+logger.setLevel(logging.INFO)
+
+@dataclass
+class NodeScore:
+    id: str
+    score: float
+
 class KnowledgeGraph:
-    """Lightweight in‑memory property‑graph wrapper."""
-    def __init__(self, graph_file: str):
-        with open(graph_file, "r") as f:
+    """Lightweight in-memory directed KG with embeddings, now pulling PDF snippets."""
+    def __init__(self, graph_file: str, embed_model: str = EMBED_MODEL):
+        logger.info(Fore.YELLOW + "Loading KG..." + Style.RESET_ALL)
+        with open(graph_file) as f:
             data = json.load(f)
-        self.nodes: Dict[str, Dict[str, Any]] = {n["id"]: n for n in data["things"]}
-        self.edges: Dict[str, List[Dict[str, str]]] = defaultdict(list)
+        self.nodes = {n["id"]: n for n in data["things"]}
+        self.out_edges = defaultdict(list)
         for e in data["associations"]:
-            self.edges[e["subject"].strip()].append(e)
+            self.out_edges[e["subject"]].append(e)
 
-    def get_node(self, node_id: str) -> Dict[str, Any]:
-        return self.nodes.get(node_id, {})
+        # Build FAISS index on node texts
+        self.embed_model = SentenceTransformer(embed_model)
+        texts, self.ids = [], []
+        for nid, node in self.nodes.items():
+            texts.append(f"{node.get('name','')} {node.get('description','')}")
+            self.ids.append(nid)
+        emb = self.embed_model.encode(texts, normalize_embeddings=True, show_progress_bar=False)
+        self.dim = emb.shape[1]
+        self.index = faiss.IndexFlatIP(self.dim)
+        self.index.add(emb.astype("float32"))
+        self.id_map = np.array(self.ids)
+        self._cache = {}
+        logger.info(Fore.GREEN + f"KG loaded: {len(self.nodes)} nodes, {sum(len(v) for v in self.out_edges.values())} edges." + Style.RESET_ALL)
 
-    def get_neighbors(self, node_id: str, hops: int = 1) -> Set[str]:
-        visited, frontier = set(), {node_id}
-        for _ in range(hops):
-            nxt = set()
-            for nid in frontier:
-                visited.add(nid)
-                for e in self.edges.get(nid, []):
-                    nxt.add(e["object"])
-            frontier = nxt
-        return visited.union(frontier)
+    def semantic_search(self, query: str, topk: int = DEFAULT_K*2) -> List[NodeScore]:
+        if query in self._cache:
+            return self._cache[query]
+        q_emb = self.embed_model.encode([query], normalize_embeddings=True)
+        _, idx = self.index.search(q_emb.astype("float32"), topk)
+        hits = [NodeScore(id=self.id_map[i], score=1.0) for i in idx[0]]
+        self._cache[query] = hits
+        return hits
 
-    def build_context(self, anchor_id: str, hops: int = 1) -> str:
-        lines: List[str] = []
-        for nid in sorted(self.get_neighbors(anchor_id, hops)):
-            n = self.get_node(nid)
-            if not n:
+    def weighted_bfs(self, seeds: List[NodeScore], max_hops: int = DEFAULT_MAX_HOPS) -> List[NodeScore]:
+        visited = {}
+        queue = deque((s.id, s.score, 0) for s in seeds)
+        while queue:
+            nid, base_score, depth = queue.popleft()
+            if depth > max_hops:
                 continue
-            lines.append(f"\n## {n.get('name', nid)} ({n.get('category', 'Unknown')})")
-            lines.append(f"Description: {n.get('description', 'N/A')}")
-            if n.get('formula'):
+            visited[nid] = max(visited.get(nid, 0), base_score)
+            for edge in self.out_edges.get(nid, []):
+                nbr = edge["object"]
+                w = 1.2 if edge["predicate"].endswith("RELATED_TO") else 1.5
+                rel_score = fuzz.token_sort_ratio(edge["predicate"], "RELATED_TO") / 100.0
+                score = base_score * w + rel_score / (depth + 1)
+                if score >= 0.01:
+                    queue.append((nbr, score, depth+1))
+        ranked = sorted((NodeScore(id=n, score=s) for n,s in visited.items()),
+                        key=lambda x: x.score, reverse=True)
+        return ranked[:DEFAULT_K]
+
+    def build_context(self, nodes: List[NodeScore]) -> str:
+        sections = []
+        for ns in nodes:
+            n = self.nodes[ns.id]
+            header = Fore.BLUE + f"## {n.get('name')} ({n.get('category')})" + Style.RESET_ALL
+            lines = [header]
+
+            # PDF snippets from polymer_papers/
+            for paper in n.get("source_papers", []):
+                pdf_path = Path(PDF_DIR) / paper
+                try:
+                    doc = fitz.open(str(pdf_path))
+                    text = "".join(p.get_text() for p in doc)
+                    snippet = text[:PDF_SNIPPET_LEN].replace("\n", " ")
+                    lines.append(Fore.YELLOW + f"[PDF snippet from {pdf_path}]" + Style.RESET_ALL)
+                    lines.append(snippet + "…")
+                except Exception as e:
+                    lines.append(Fore.RED + f"[Could not load PDF {pdf_path}: {e}]" + Style.RESET_ALL)
+
+            # Node description and formula
+            lines.append(f"Description: {n.get('description','N/A')}")
+            if n.get("formula"):
                 lines.append(f"Formula: {n['formula']}")
-            for e in self.edges.get(nid, []):
-                m = self.get_node(e["object"])
-                if not m:
-                    continue
+
+            # Outgoing edges
+            for e in sorted(self.out_edges.get(ns.id, []), key=lambda x: x["predicate"]):
+                tgt = self.nodes.get(e["object"], {})
                 pred = e["predicate"].split(":")[-1]
-                entry = f"- {pred}: {m.get('name', e['object'])}"
+                entry = f"- {pred}: {tgt.get('name', e['object'])}"
                 if e.get("has_evidence"):
                     entry += f" ({e['has_evidence']})"
                 lines.append(entry)
-        return "\n".join(lines)
 
-# === NODE SEARCHER =======================================================
-class NodeSearcher:
-    """Hybrid embedding + fuzzy keyword retrieval over KG nodes."""
-    def __init__(self, kg: KnowledgeGraph):
-        self.kg = kg
-        self.model = SentenceTransformer(EMBED_MODEL)
+            sections.append("\n".join(lines))
 
-        texts, ids = [], []
-        for nid, node in kg.nodes.items():
-            blob = f"{node.get('name', '')} {node.get('description', '')}".strip()
-            if blob:
-                texts.append(blob)
-                ids.append(nid)
+        return "\n\n".join(sections)
 
-        vecs = self.model.encode(texts, normalize_embeddings=True, show_progress_bar=False)
-        self.index = faiss.IndexFlatIP(vecs.shape[1])
-        self.index.add(vecs.astype("float32"))
-        self.id_arr = np.array(ids)
 
-    def _exact_name_match(self, query: str, name: str) -> bool:
-        q, n = query.lower(), name.lower()
-        return f" {n} " in f" {q} "
+class OllamaClient:
+    """Async client for Ollama."""
+    def __init__(self, url=OLLAMA_API_URL, model=OLLAMA_MODEL, temp=0.0):
+        self.url, self.model, self.temp = url, model, temp
 
-    def find(self, query: str, k: int = K_NEIGHBORS) -> List[str]:
-        q_vec = self.model.encode([query], normalize_embeddings=True)
-        _, idx = self.index.search(q_vec.astype("float32"), k * 6)
-        cand_ids = self.id_arr[idx[0]].tolist()
+    async def chat(self, prompt: str, history: List[Dict[str,str]]) -> str:
+        msgs = history + [{"role":"user","content":prompt}]
+        async with aiohttp.ClientSession() as sess:
+            resp = await sess.post(
+                self.url,
+                json={
+                    "model":    self.model,
+                    "stream":   False,               # ← disable streaming
+                    "messages": msgs,
+                    "options":  {"temperature": self.temp}
+                },
+                timeout=90
+            )
+            txt = await resp.text()
+            try:
+                data = json.loads(txt)
+                content = data["message"]["content"]
+            except Exception:
+                content = txt
+            history.append({"role":"assistant","content":content})
+            return content
 
-        scored: List[tuple[int, int, str]] = []
-        for cid in cand_ids:
-            node = self.kg.get_node(cid)
-            name = node.get("name", "")
-            text = f"{name} {node.get('description', '')}"
-            fuzzy = fuzz.token_set_ratio(query, text)
-            exact = 1 if self._exact_name_match(query, name) else 0
-            scored.append((exact, fuzzy, cid))
 
-        scored.sort(key=lambda t: (t[0], t[1]), reverse=True)
-        best, seen = [], set()
-        for _, _, cid in scored:
-            if cid not in seen:
-                best.append(cid)
-                seen.add(cid)
-            if len(best) >= k:
+rag_history: List[Dict[str,str]] = []
+baseline_history: List[Dict[str,str]] = []
+
+async def answer_question(question: str,
+                          kg: KnowledgeGraph,
+                          client: OllamaClient):
+    print(Fore.MAGENTA + f"\nQuestion: {question}" + Style.RESET_ALL)
+
+    seeds    = kg.semantic_search(question)
+    print(Fore.YELLOW + f"Seeds: {[s.id for s in seeds]}" + Style.RESET_ALL)
+
+    relevant = kg.weighted_bfs(seeds)
+    print(Fore.CYAN + f"Selected: {[r.id for r in relevant]}" + Style.RESET_ALL)
+
+    context = kg.build_context(relevant)
+
+    # KG-RAG call
+    if not rag_history:
+        rag_history.append({"role":"system","content":"You are an expert materials-science assistant."})
+    rag_resp = await client.chat(f"Use this KG context:\n\n{context}\n\nQ: {question}\nA:", rag_history)
+
+    # Baseline call
+    if not baseline_history:
+        baseline_history.append({"role":"system","content":"You are an expert materials-science assistant without KG."})
+    base_resp = await client.chat(f"Answer concisely:\n\nQ: {question}\nA:", baseline_history)
+
+    # Print both
+    print(Fore.GREEN + "\n[Baseline Answer]\n" + base_resp + Style.RESET_ALL)
+    print(Fore.GREEN + "\n[KG-RAG Answer]\n" + rag_resp  + Style.RESET_ALL)
+
+
+async def main_async():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--graph", type=Path, default=GRAPH_FILE)
+    parser.add_argument("--question", type=str)
+    args = parser.parse_args()
+
+    kg     = KnowledgeGraph(str(args.graph))
+    client = OllamaClient()
+
+    if args.question:
+        await answer_question(args.question, kg, client)
+    else:
+        while True:
+            q = input(Fore.YELLOW + "Enter question (or 'exit'): " + Style.RESET_ALL).strip()
+            if not q or q.lower()=="exit":
                 break
-        return best
-
-# === OLLAMA CALLER =======================================================
-
-def _call_ollama(prompt: str, history: List[Dict[str, str]], model: str = OLLAMA_MODEL, temperature: float = 0.0) -> str:
-    """Send prompt + prior history to Ollama, update history with assistant reply."""
-    messages = history + [{"role": "user", "content": prompt}]
-    try:
-        r = requests.post(
-            OLLAMA_API_URL,
-            json={
-                "model": model,
-                "messages": messages,
-                "stream": False,
-                "options": {"temperature": temperature},
-            },
-            timeout=90,
-        )
-        if r.status_code != 200:
-            return f"[LLM Error {r.status_code}]"
-        try:
-            data = r.json()
-        except ValueError:
-            # fallback for newline‑delimited JSON
-            data = None
-            for line in reversed([ln for ln in r.text.splitlines() if ln.strip()]):
-                try:
-                    data = json.loads(line)
-                    break
-                except ValueError:
-                    continue
-            if data is None:
-                return "[Cannot parse LLM response]"
-        content = data.get("message", {}).get("content", "[No content]")
-        history.append({"role": "assistant", "content": content})
-        return content
-    except Exception as e:
-        return f"[Exception: {e}]"
-
-# === PROMPT HELPERS ======================================================
-
-def ask_rag(question: str, context: str) -> str:
-    prompt = f"""Use the following knowledge‑graph context to answer the question.
-
-Context:
-{context}
-
-Question: {question}
-Answer:"""
-    rag_history.append({"role": "system", "content": "You are an expert materials‑science assistant."}) if not rag_history else None
-    return _call_ollama(prompt, rag_history)
-
-
-def ask_baseline(question: str) -> str:
-    baseline_history.append({"role": "system", "content": "You are an expert materials‑science assistant without access to the KG."}) if not baseline_history else None
-    prompt = f"Answer the following question concisely and accurately:\n\nQuestion: {question}\nAnswer:"
-    return _call_ollama(prompt, baseline_history)
-
-# === CLI LOOP ============================================================
-
-def interactive():
-    print("Loading KG …", end=" ")
-    kg = KnowledgeGraph(GRAPH_FILE)
-    searcher = NodeSearcher(kg)
-    print("done.")
-
-    while True:
-        q = input("\nAsk a materials‑science question (or 'exit'): ")
-        if q is None or q.strip().lower() == "exit":
-            break
-        q = q.strip()
-        if not q:
-            continue
-
-        hits = searcher.find(q)
-        print("Top KG matches:", hits)
-        context = "\n---\n".join(kg.build_context(nid, HOPS) for nid in hits)
-
-        mode = input("Mode — rag | baseline | compare [rag]: ").strip().lower() or "rag"
-        if mode == "baseline":
-            print("\n[Baseline]\n" + ask_baseline(q))
-        elif mode == "compare":
-            print("\n[KG‑RAG]\n" + ask_rag(q, context))
-            print("\n[Baseline]\n" + ask_baseline(q))
-        else:
-            print("\n[KG‑RAG]\n" + ask_rag(q, context))
+            await answer_question(q, kg, client)
 
 
 if __name__ == "__main__":
-    interactive()
+    asyncio.run(main_async())
