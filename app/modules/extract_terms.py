@@ -23,12 +23,14 @@ class OllamaTermExtractor:
     This class processes PDFs, sends page content to the LLM via the Ollama API, and aggregates
     extracted terms with enhanced metadata including extraction date, context snippets, and fuzzy merging.
     """
-
+    # play with repition penalty (repeated tokens)
+    # length penalty (keep the output concise)
     def __init__(
         self,
         ollama_model: str = "llama3.2",
         ollama_base_url: str = "http://localhost:11434",
-        temperature: float = 0.1,
+        temperature: float = 0.025, # 0.1, # out of every 10 tokens, 1 is outside the normal distribution
+        # if we keep temperature very low, we can compare results
         data_dir: str = "./polymer_papers_all",
         output_file: str = "./storage/terminology/extracted_terms.json",
         context_length: int = 50,  # Number of words for context snippet
@@ -102,6 +104,7 @@ class OllamaTermExtractor:
             str: Extracted text.
         """
         try:
+            # We can try different methods to extract text if needed
             doc = fitz.open(pdf_path)
             if 0 <= page_num < len(doc):
                 return doc[page_num].get_text()
@@ -239,6 +242,7 @@ class OllamaTermExtractor:
             logger.info(f"Skipping page {page_num+1} - too short")
             return False
 
+        # Look into running with Slurm for bigger models
         # Updated prompt with "relations" field.
         prompt = f"""Extract key terminology from this page of a materials science paper.
 

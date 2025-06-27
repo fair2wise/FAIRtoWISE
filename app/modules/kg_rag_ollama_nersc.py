@@ -10,10 +10,10 @@ import faiss
 # === CONFIGURATION ===
 OLLAMA_MODEL = "mistral-small3.1:latest"  # "llama3.2"  # Adjust if you use a different tag
 OLLAMA_API_URL = "http://localhost:11434/api/chat"
-GRAPH_FILE = "storage/kg/matkg_graph.json"
+GRAPH_FILE = "/pscratch/sd/d/dabramov/fair2wise/matkg_graph_new1.json"
 K_NEIGHBORS = 3              # how many KG nodes to pull per query
 HOPS = 4                     # default neighborhood size
-EMBED_MODEL = "all-MiniLM-L6-v2"  # 80 MB, fast & solid
+EMBED_MODEL = "all-MiniLM-L6-v2" # 80 MB, fast & solid
 
 # === GLOBAL CHAT HISTORIES ==============================================
 # We keep separate message lists so the RAG and baseline chats do NOT bleed
