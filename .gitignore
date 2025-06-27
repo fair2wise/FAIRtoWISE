@@ -137,3 +137,5 @@ clientid.txt
 priv_key.jwk
 priv_key.pem
 sfapi_training.json
+
+*.obo
