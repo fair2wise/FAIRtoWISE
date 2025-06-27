@@ -1,0 +1,28 @@
+What solution-processing methods are effective to create high-quality OPVs?
+How can I examine the nanostructure of an OPV using synchrotron radiation?
+What metrics are useful to determine the performance of an OPV?
+What can ultra-fast spectroscopy tell me about an OPV?
+How do I measure short circuit current in an OPV?
+What properties of an OPV determine how high a short circuit current will be?
+I am not getting very efficient OPVs compared to literature values. What can I check for in my laboratory to try and troubleshoot what may be happening?
+What is the highest efficiency OPV that has ever been tested? What processing steps were used to achieve this result?
+Explain the concept of radiative versus non-radiative loss channels as they relate to OPVs.
+What are the best methods to measure radiative versus non-radiative recombination in OPVs?
+Can you give me an example device stack for OPVs? What layer thicknesses should I use for each element?
+Can you give me an example inverted device stack for OPVs? What layer thicknesses should I use for each element?
+What are the differences between Y5, Y6, Y7, Y8, and Y18 molecules?
+How important are co-crystals between Donor and Acceptor in OPVs?
+What are the advantages of ITIC derived acceptor molecules compared to Y6?
+What are methods that I can use to improve the light-stability of my OPV devices?
+What are the advantages of a ternary OPV blend? Can you give me examples of high performing materials and specific blend ratios that I should use?
+I am making a bilayer OPV using CuPC and ZnPc. What is the morphology of those two molecules and how can I prepare devices using vapor deposition? What should I consider during device fabrication?
+Where should I buy OPV donor and acceptor materials?
+What does resonant scattering tell me about an OPV active layer?
+Can you explain to me the steps of conducting RSOXS at the Advanced Light Source? Who should I contact to learn more about this technique?
+How do I interpret polarization-induced anisotropic resonant scattering? In what ways could I misinterpret the data?
+What does an integrated scattering intensity tell me in RSOXS and when is it appropriate to use such an analysis?
+What properties of an OPV can I measure using the Advanced Light Source?
+What are the benefits of using fullerene acceptors instead of non-fullerene acceptors in OPVs?
+Why is P3HT a much better donor polymer to use than PM6?
+Why do acceptor molecules similar to (2,2′-((2Z,2′Z)-((12,13-bis(2-ethylhexyl)-3,9-diundecyl-12,13-dihydro-[1,2,5]thiadiazolo[3,4-e]thieno[2,"3′’:4’,5′]thieno[2′,3′:4,5]pyrrolo[3,2-g]thieno[2′,3′:4,5]thieno[3,2-b]indole-2,10-diyl)bis(methanylylidene))bis(5,6-difluoro-3-oxo-2,3-dihydro-1H-indene-2,1-diylidene))dimalononitrile) perform so much better than fullerenes.
+Why do acceptor molecules similar to Y6 perform so much better than fullerenes?
