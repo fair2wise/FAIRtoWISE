@@ -1,0 +1,9 @@
+Level	Rule Name	Subject	Property	Value
+ERROR	missing_ontology_description	http://example.org/materials/	dc:description	
+ERROR	missing_ontology_license	http://example.org/materials/	dc:license	
+ERROR	missing_ontology_title	http://example.org/materials/	dc:title	
+WARN	missing_definition	http://example.org/materials/Application	IAO:0000115	
+WARN	missing_definition	http://example.org/materials/Material	IAO:0000115	
+WARN	missing_definition	http://example.org/materials/Method	IAO:0000115	
+WARN	missing_definition	http://example.org/materials/Property	IAO:0000115	
+WARN	missing_definition	http://example.org/materials/Structure	IAO:0000115	
