@@ -1,6 +1,5 @@
-# project_template
+# FAIR 2 WISE
 
-This template includes common configuration and settings for ALS Computing projects.
 
 <!-- TREE START -->
 <pre>
