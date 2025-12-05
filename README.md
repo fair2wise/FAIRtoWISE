@@ -77,31 +77,18 @@ Write unit tests with PyTest and they will run when you submit a push to GitHub.
 
 ## LBNL Software Disclosure and Distribution
 
-[Here is the official lab policy regarding software disclosure and distribution,](https://commons.lbl.gov/display/rpm2/Software+Disclosure+and+Distribution#SoftwareDisclosureandDistribution--1898802862) and below you will find a summarized version. It is general good practice to keep your projects marked as `private` until you properly disclose your software through the lab.
-
-- **Purpose:**  
-  Ensure DOE compliance by reporting all software intended for external distribution to the Intellectual Property Office (IPO).
-
-- **Who Must Comply:**  
-  Berkeley Lab software developers and affiliates (employees, faculty, and on-site collaborators).
-
-- **When to Report:**  
-  - Before distributing any new or modified software.
-  - Exemptions: Already disclosed or minor updates (<25% change without added functionality).
-
-- **Key Requirements:**  
-  - **Submission:** Complete a Software Disclosure form prior to external distribution.
-  - **Licensing:**  
-    - Obtain appropriate license agreements through IPO.
-    - Prefer permissive licenses (BSD, MIT) over proprietary or viral open source licenses (e.g., GNU GPL).
-  - **Documentation:**  
-    - Record third-party licenses, contributor information, and funding sources.
-  - **Tracking:**  
-    - If distributed via personal repositories or websites, track and report download/licensing metrics annually.
-
-- **IPO Responsibilities:**  
-  Review disclosures, secure DOE approvals, manage licensing agreements, and maintain records.
-
-- **Contact:**  
+Copyright (c) 2025, The Regents of the University of California, through Lawrence Berkeley National Laboratory (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights reserved.
+ 
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+ 
+(1) Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ 
+(2) Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+ 
+(3) Neither the name of the University of California, Lawrence Berkeley National Laboratory, U.S. Dept. of Energy nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+ 
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ 
+You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the features, functionality or performance of the source code (“Enhancements”) to anyone; however, if you choose to make your Enhancements available either publicly, or directly to Lawrence Berkeley National Laboratory, without imposing a separate written license agreement for such Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free perpetual license to install, use, modify, prepare derivative works, incorporate into other computer software, distribute, and sublicense such Enhancements or derivative works thereof, in binary and source code form.
   For questions, reach out to the Licensing Manager at [ipo@lbl.gov](mailto:ipo@lbl.gov).
 
