@@ -307,7 +307,6 @@ class OllamaTermExtractor:
         mp_api_key = os.environ.get("MP_API_KEY", "")
         if not mp_api_key:
             logger.warning("MP_API_KEY not set; formula validation may be incomplete.")
-            mp_api_key = "JziDvAj2FWxzonCe2hketK1yz4bKHRlA"
         self.formula_checker = ChemicalFormulaValidator(api_key=mp_api_key)
 
         self.schema_helper = SchemaHelper(schema_path=schema_path)
