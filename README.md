@@ -1,5 +1,6 @@
 # FAIR 2 WISE
 
+This repo is now deprecated. Please refer to https://github.com/fair2wise/FAIR2WISE for the latest updates.
 
 <!-- TREE START -->
 <pre>
